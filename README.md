@@ -12,4 +12,4 @@ Si el visitante elige «México», el manual le sugiere ir al **Manual Binance**
 
 > Las pantallas de Coinbase son ilustraciones con datos ficticios. El contenido financiero requiere validación de Compliance y Legal antes de publicarse a clientes.
 
-Manual creado por Rodrigo Fabela · Axen Broker.
+Manuales creados para Axen Capital.
