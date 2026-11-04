@@ -858,6 +858,28 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding-block:
 .ss-x:hover{background:var(--tint);color:var(--ink)}
 .ss-x svg{width:18px;height:18px}
 :root:not([data-c="us"]) [data-only="us"],:root[data-c="us"] [data-only="mx"]{display:none!important}
+
+/* ---- Intervenciones: pantalla dividida entre plataformas ---- */
+#panes{position:absolute;inset:0;z-index:0;pointer-events:none}
+.pane{position:absolute;top:0;bottom:0;overflow:hidden}
+.pane::before{content:"";position:absolute;inset:0;background:radial-gradient(72% 56% at 50% 44%,color-mix(in srgb,var(--pc) 30%,transparent) 0%,transparent 72%)}
+.pane::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(0deg,color-mix(in srgb,var(--pc) 16%,transparent),transparent)}
+.pane.off::before{opacity:.5}.pane.off::after{opacity:.6}
+.pane-tag{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 10px;border-radius:999px;background:var(--surface);color:var(--ink);font:600 12px/1.25 var(--f-display);border:1px solid color-mix(in srgb,var(--pc) 55%,var(--line));box-shadow:0 6px 18px -8px rgba(0,0,0,.35);white-space:nowrap;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis}
+.pane-tag i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 28%,transparent)}
+.pane-tag small{font-weight:500;color:var(--muted);font-size:11px}
+.pane.on .pane-tag{border-width:1.5px}
+.pane-div{position:absolute;top:7%;bottom:7%;width:2px;margin-left:-1px;background:linear-gradient(180deg,transparent,var(--a) 28%,var(--b) 72%,transparent);opacity:.8;transform-origin:50% 50%}
+.pane-swap{position:absolute;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:0 8px 22px -10px rgba(0,0,0,.45)}
+.pane-swap svg{width:17px;height:17px}
+.devwrap{transform-origin:50% 50%}
+.devbox.frozen{pointer-events:none}
+.devbox.frozen .devwrap{opacity:.62;filter:saturate(.5) brightness(.9)}
+.devbox.ghost{pointer-events:none}
+.swpill{position:absolute;z-index:7;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:9px;padding:10px 17px 10px 13px;border-radius:999px;background:var(--inv);color:var(--inv-ink);font:600 14px/1.2 var(--f-display);box-shadow:0 16px 36px -12px rgba(0,0,0,.55);white-space:nowrap;pointer-events:none}
+.swpill i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--pc);box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 32%,transparent)}
+.swpill svg{width:16px;height:16px;flex:none}
+@media (max-width:560px){.pane-tag small{display:none}.swpill{font-size:13px;padding:8px 14px 8px 11px}}
 </style>
 </head>
 <body>
@@ -1071,7 +1093,9 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding-block:
       <div class="stage" id="stage">
         <div class="grid"></div>
         <div class="flag" id="flag"></div>
+        <div id="panes" aria-hidden="true"></div>
         <div id="stageBody"></div>
+        <div class="swpill" id="swpill" hidden></div>
         <div class="tip" id="tip" hidden></div>
         <div class="pointer" id="pointer" hidden><svg viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.1 1.3 3.6 6.6-2.6 1.4-3.6-6.6L5 18z" fill="#fff" stroke="#101820" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
         <div class="tapdot" id="tapdot" hidden></div>
@@ -1514,7 +1538,7 @@ function shotDevice(s){
     const site=m.site, url=site==="ax"?"my.axenbroker.com":site==="mail"?"mail.google.com":C==="us"?(s.url||"coinbase.com"):(s.url||`binance.com<em>/es-MX</em>`), tab=site==="ax"?"Axen Broker · Portal":site==="mail"?"Correo":C==="us"?"Coinbase":"Binance";
     return {kind:"web",html:`<div class="dev-web th-bn bweb"><div class="lid"><i class="cam"></i><div class="browser"><div class="tabs"><span class="tl"><i></i><i></i><i></i></span><span class="tab on"><i class="fav" style="--fav:${site==="ax"?"#0066FF":site==="mail"?"#EA4335":C==="us"?"#0052FF":"#FCD535"}"></i><span>${tab}</span><b>×</b></span><span class="add">+</span></div><div class="addr"><span>‹</span><span>›</span><span>↻</span><span class="url">${ICO.lock}${url}</span><span>☆</span></div><div class="site" style="background:${m.bg}"><div class="wmain shot" style="background:${m.bg}">${shot}</div></div></div></div><div class="base"></div></div>`};
   }
-  return {kind:"phone",html:`<div class="dev-phone th-bn"><i class="sk l1"></i><i class="sk l2"></i><i class="sk l3"></i><i class="sk r1"></i><div class="glass img" style="background:${m.bg}">${m.sb?"":`<div class="sbar" style="color:${fg}"><span>9:41</span><span class="island"></span><span class="ic">${ICO.sig}${ICO.wifi}${ICO.bat}</span></div>`}<div class="scr shot">${shot}</div>${m.sb?`<div class="sbar" style="position:absolute;top:0;left:0;right:0;background:none;color:transparent;pointer-events:none"><span></span><span class="island"></span><span></span></div>`:""}<div class="homebar" style="color:${fg}"><i></i></div></div></div>`};
+  return {kind:"phone",html:`<div class="dev-phone th-bn"><i class="sk l1"></i><i class="sk l2"></i><i class="sk l3"></i><i class="sk r1"></i><div class="glass img" style="background:${m.bg}">${m.sb?"":`<div class="sbar" style="color:${fg}"><span></span><span class="island"></span><span class="ic">${ICO.sig}${ICO.wifi}${ICO.bat}</span></div>`}<div class="scr shot">${shot}</div>${m.sb?`<div class="sbar" style="position:absolute;top:0;left:0;right:0;background:none;color:transparent;pointer-events:none"><span></span><span class="island"></span><span></span></div>`:""}<div class="homebar" style="color:${fg}"><i></i></div></div></div>`};
 }
 function layoutShot(root){
   root.querySelectorAll(".shot").forEach(box=>{
@@ -1548,7 +1572,7 @@ function device(s){
     return {kind:"web",html:`<div class="dev-web th-${th} ${th==="ax"?"axweb":"bweb"}"><div class="lid"><i class="cam"></i><div class="browser"><div class="tabs"><span class="tl"><i></i><i></i><i></i></span><span class="tab on"><i class="fav" style="--fav:${fav}"></i><span>${tab}</span><b>×</b></span><span class="add">+</span></div><div class="addr"><span>‹</span><span>›</span><span>↻</span><span class="url">${ICO.lock}${url}</span><span>☆</span></div><div class="site">${site}</div></div></div><div class="base"></div></div>`};
   }
   const light=th!=="bn";
-  return {kind:"phone",html:`<div class="dev-phone th-${th}"><i class="sk l1"></i><i class="sk l2"></i><i class="sk l3"></i><i class="sk r1"></i><div class="glass"><div class="sbar" style="color:${light?"#000":"#fff"}"><span>9:41</span><span class="island"></span><span class="ic">${ICO.sig}${ICO.wifi}${ICO.bat}</span></div><div class="scr">${screenHTML(s,th)}</div>${th==="bn"?tabsFor(s):""}<div class="homebar" style="color:${light?"#000":"#fff"}"><i></i></div></div></div>`};
+  return {kind:"phone",html:`<div class="dev-phone th-${th}"><i class="sk l1"></i><i class="sk l2"></i><i class="sk l3"></i><i class="sk r1"></i><div class="glass"><div class="sbar" style="color:${light?"#000":"#fff"}"><span></span><span class="island"></span><span class="ic">${ICO.sig}${ICO.wifi}${ICO.bat}</span></div><div class="scr">${screenHTML(s,th)}</div>${th==="bn"?tabsFor(s):""}<div class="homebar" style="color:${light?"#000":"#fff"}"><i></i></div></div></div>`};
 }
 
 /* ---- portada y menú ---- */
@@ -1574,20 +1598,149 @@ function termify(txt){
 /* ---- render del paso ---- */
 const stage=$("stage"), body=$("stageBody"), tip=$("tip"), ptr=$("pointer"), tap=$("tapdot");
 let devEl=null;
-function fitDevice(){
-  if(!devEl) return;
-  const sw=stage.clientWidth, sh=stage.clientHeight, w=devEl.offsetWidth, h=devEl.offsetHeight;
-  const top=46, bottom=16, isPhone=devEl.classList.contains("dev-phone");
-  const side = sw>560 ? (isPhone ? 24 : 28) : 12;
-  const sc=Math.min((sw-side*2)/w, (sh-top-bottom)/h, isPhone?1.15:1.4);
-  const cx = sw/2, cy = top + (sh-top-bottom)/2;
-  devEl.parentElement.style.transform=`translate(calc(-50% + ${cx-sw/2}px), calc(-50% + ${cy-sh/2}px)) scale(${sc})`;
+/* ---- intervenciones: cuando el flujo cambia de plataforma, la pantalla se divide ---- */
+let SPLITL=null, paneTok=0;
+function platOf(s){ const m=s&&s.img&&typeof IMG!=="undefined"&&IMG[s.img]; if(m) return m.site==="ax"?"ax":m.site==="mail"?"mail":"ex"; return themeOf(s)==="ax"?"ax":"ex"; }
+function platName(p){ return p==="ax"?"Axen Broker":p==="mail"?"Tu correo":PLAT(); }
+function paneColor(p){ return p==="ax"?"#7B5CFF":p==="mail"?"#EA4335":(C==="us"?"#0052FF":"#F0B90B"); }
+function layoutFor(i){
+  /* pila de plataformas: la de abajo es donde te quedaste, la de arriba donde sigues; el correo es una consulta rápida */
+  const st=[], last={};
+  for(let k=0;k<=i&&k<SL.length;k++){ const x=SL[k]; if(x.type!=="step") continue; const p=platOf(x.s.s); last[p]=k;
+    if(st.length&&st[st.length-1]==="mail"&&p!=="mail") st.pop();
+    const j=st.lastIndexOf(p); if(j>=0) st.length=j+1; else st.push(p); }
+  if(st.length>=2){ const m=st[st.length-2], sd=st[st.length-1]; return {split:true,main:m,side:sd,lastMain:last[m]}; }
+  return {split:false,main:st[0]||"ex"};
+}
+function splitFrac(mk,sk){ const n=stage.clientWidth<560; if(mk==="phone"&&sk==="phone") return n?.47:.44; if(mk==="phone") return n?.3:.31; if(sk==="phone") return n?.5:.52; return n?.3:.36; }
+function areas(){
+  const sw=stage.clientWidth, top=46;
+  if(!SPLITL||!SPLITL.split) return {one:{x:0,w:sw,top,bottom:16}};
+  const f=SPLITL.f, b=sw<560?44:50;
+  return {main:{x:0,w:sw*f,top:top+8,bottom:b},side:{x:sw*f,w:sw*(1-f),top,bottom:b}};
+}
+function fitBox(box,a){
+  const dev=box.querySelector(".dev-phone,.dev-web"); if(!dev) return;
+  const sw=stage.clientWidth, sh=stage.clientHeight, w=dev.offsetWidth, h=dev.offsetHeight, isPhone=dev.classList.contains("dev-phone");
+  const pad = a.w>560 ? (isPhone ? 24 : 28) : (SPLITL&&SPLITL.split?10:12);
+  let sc=Math.min((a.w-pad*2)/w, (sh-a.top-a.bottom)/h, isPhone?1.15:1.4);
+  if(box.classList.contains("frozen")) sc*=.94;
+  const cx=a.x+a.w/2, cy=a.top+(sh-a.top-a.bottom)/2;
+  box.style.transform=`translate(calc(-50% + ${cx-sw/2}px), calc(-50% + ${cy-sh/2}px)) scale(${sc})`;
+}
+function fitDevice(){ const A=areas(); body.querySelectorAll(".devbox:not(.ghost)").forEach(b=>fitBox(b,A[b.dataset.role]||A.one)); }
+const SW_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>';
+const GO_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>';
+const BK_ICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>';
+function panesHTML(L){
+  const f=(L.f*100).toFixed(2), cm=paneColor(L.main), cs=paneColor(L.side);
+  return `<div class="pane off" style="left:0;width:${f}%;--pc:${cm}"><span class="pane-tag"><i></i>${esc(platName(L.main))}<small>· aquí te quedaste</small></span></div>`
+   +`<div class="pane on" style="left:${f}%;right:0;--pc:${cs}"><span class="pane-tag"><i></i>${esc(platName(L.side))}<small>· continúa aquí</small></span></div>`
+   +`<div class="pane-div" style="left:${f}%;--a:${cm};--b:${cs}"></div><span class="pane-swap" style="left:${f}%">${SW_ICO}</span>`;
+}
+function renderPanes(L,prevL,anim){
+  const el=$("panes"), was=!!(prevL&&prevL.split&&el.children.length);
+  if(!L||!L.split){
+    const tok=++paneTok;
+    if(was&&anim){ [...el.children].forEach(k=>k.animate([{opacity:1},{opacity:0}],{duration:460,easing:"ease-out",fill:"forwards"})); setTimeout(()=>{ if(tok===paneTok) el.innerHTML=""; },480); }
+    else el.innerHTML="";
+    return;
+  }
+  paneTok++;
+  if(was&&prevL.main===L.main&&prevL.side===L.side&&Math.abs(prevL.f-L.f)<.001) return;
+  el.innerHTML=panesHTML(L);
+  if(!anim) return;
+  const [pm,ps,dv,bd]=el.children, swap=was;
+  if(!swap){
+    pm.animate([{opacity:0},{opacity:1}],{duration:700,easing:"ease-out"});
+    ps.animate([{opacity:0,transform:"translateX(10%)"},{opacity:1,transform:"none"}],{duration:950,delay:120,easing:"cubic-bezier(.22,1,.36,1)",fill:"backwards"});
+    dv.animate([{transform:"scaleY(0)",opacity:0},{transform:"scaleY(1)",opacity:.8}],{duration:760,delay:280,easing:"cubic-bezier(.22,1,.36,1)",fill:"backwards"});
+    bd.animate([{transform:"scale(0) rotate(-180deg)",opacity:0},{transform:"scale(1.15) rotate(12deg)",opacity:1,offset:.7},{transform:"none",opacity:1}],{duration:620,delay:1950,easing:"cubic-bezier(.3,1.3,.5,1)",fill:"backwards"});
+    [pm,ps].forEach((p,k)=>p.querySelector(".pane-tag").animate([{opacity:0,transform:"translate(-50%,12px)"},{opacity:1,transform:"translate(-50%,0)"}],{duration:500,delay:760+k*140,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"}));
+  } else {
+    (prevL.main===L.main?[ps]:[pm,ps]).forEach(p=>p.animate([{opacity:0},{opacity:1}],{duration:650,easing:"ease-out"}));
+    ps.querySelector(".pane-tag").animate([{opacity:0,transform:"translate(-50%,12px)"},{opacity:1,transform:"translate(-50%,0)"}],{duration:480,delay:420,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"});
+    dv.animate([{opacity:.3},{opacity:.8}],{duration:600});
+    bd.animate([{transform:"rotate(0)"},{transform:"rotate(360deg)"}],{duration:700,easing:"cubic-bezier(.65,0,.35,1)"});
+  }
+}
+function swPill(txt,x,y,p,back){
+  if(reduce) return; const pl=$("swpill");
+  pl.innerHTML=`${back?BK_ICO:""}<i style="--pc:${paneColor(p)}"></i><span>${esc(txt)}</span>${back?"":GO_ICO}`; pl.hidden=false;
+  const fr=stage.clientWidth; pl.style.left=Math.min(Math.max(x,pl.offsetWidth/2+10),fr-pl.offsetWidth/2-10)+"px"; pl.style.top=y+"px";
+  pl.getAnimations().forEach(a=>a.cancel());
+  const T="translate(-50%,-50%)";
+  pl.animate([{opacity:0,transform:`${T} scale(.6)`},{opacity:1,transform:`${T} scale(1.05)`,offset:.12},{opacity:1,transform:`${T} scale(1)`,offset:.2},{opacity:1,transform:`${T} scale(1)`,offset:.84},{opacity:0,transform:`${T} scale(.92)`}],{duration:back?1600:2100,delay:back?120:260,easing:"ease-out",fill:"both"}).onfinish=()=>{ pl.hidden=true; };
+}
+function snapDevices(){
+  const o={};
+  body.querySelectorAll(".devbox:not(.ghost)").forEach(b=>{ const w=b.querySelector(".devwrap"), d=b.querySelector(".dev-phone,.dev-web"); if(!w||!d) return;
+    o[b.dataset.role]={box:b,rect:w.getBoundingClientRect(),plat:b.dataset.plat,i:+b.dataset.i,scr:d.querySelector(".scr,.wmain"),kind:kindOf(d)}; });
+  return o;
+}
+function flipFrom(box,old,dur,delay){
+  const w=box.querySelector(".devwrap"), nr=w.getBoundingClientRect(); if(!nr.width||!old.rect.width) return;
+  const sc=nr.width/w.offsetWidth, ratio=old.rect.width/nr.width;
+  const dx=(old.rect.left+old.rect.width/2-(nr.left+nr.width/2))/sc, dy=(old.rect.top+old.rect.height/2-(nr.top+nr.height/2))/sc;
+  w.animate([{transform:`translate(${dx}px,${dy}px) scale(${ratio})`},{transform:"none"}],{duration:dur,delay:delay||0,easing:"cubic-bezier(.65,0,.25,1)",fill:"backwards"});
+}
+function dimAnim(box,toDim,dur,delay){
+  const k=[{opacity:1,filter:"saturate(1) brightness(1)"},{opacity:.62,filter:"saturate(.5) brightness(.9)"}];
+  box.querySelector(".devwrap").animate(toDim?k:[k[1],k[0]],{duration:dur,delay:delay||0,easing:"ease-in-out",fill:"backwards"});
+}
+function ghostOut(old,how){
+  const g=old.box.cloneNode(true); g.classList.add("ghost"); g.classList.remove("frozen"); g.setAttribute("aria-hidden","true"); g.inert=true;
+  g.querySelectorAll("[id]").forEach(x=>x.removeAttribute("id"));
+  if(old.box.classList.contains("frozen")) g.querySelector(".devwrap").style.cssText="opacity:.62;filter:saturate(.5) brightness(.9)";
+  body.appendChild(g);
+  const w=g.querySelector(".devwrap"), sc=old.rect.width/(w.offsetWidth||1), fr=stage.getBoundingClientRect();
+  const dx=(fr.right-old.rect.left+40)/sc;
+  const dl=(old.rect.right-fr.left+40)/sc, L=how==="left", D=L?-dl:dx;
+  const kf=[{transform:"none",opacity:1},{transform:`translateX(${-D*.03}px) scale(1.02)`,opacity:1,offset:.2},{transform:`translateX(${D}px) rotate(${L?-7:7}deg) scale(.86)`,opacity:0}];
+  w.animate(kf,{duration:720,easing:"cubic-bezier(.55,0,.75,.2)",fill:"forwards"}).onfinish=()=>g.remove();
+}
+function enterSide(box,delay,fromLeft){
+  const w=box.querySelector(".devwrap"), nr=w.getBoundingClientRect(), fr=stage.getBoundingClientRect(); if(!nr.width) return;
+  const sc=nr.width/w.offsetWidth, dx=fromLeft?-(nr.right-fr.left+30)/sc:(fr.right-nr.left+30)/sc;
+  w.animate([{transform:`translateX(${dx}px) rotate(${fromLeft?-6:6}deg) scale(.86)`,opacity:0},{transform:`translateX(${-dx*.035}px) rotate(-1deg) scale(1.01)`,opacity:1,offset:.72},{transform:"none",opacity:1}],{duration:920,delay,easing:"cubic-bezier(.22,1,.36,1)",fill:"backwards"});
+}
+function transitionDevices(OLD,prevL,L,dir,sameRec,newScr){
+  const devOf=b=>b.querySelector(".dev-phone,.dev-web"), sw=stage.clientWidth, sh=stage.clientHeight;
+  const news=[...body.querySelectorAll(".devbox:not(.ghost)")], olds=Object.values(OLD);
+  const fresh=()=>{ lastPtr=null;
+    devEl.animate([{opacity:0,transform:"translateY(22px) scale(.95)"},{opacity:1,transform:"none"}],{duration:560,easing:"cubic-bezier(.2,.8,.2,1)"}); stagger(newScr,dir,220);
+    news.filter(b=>b.classList.contains("frozen")).forEach(b=>devOf(b).animate([{opacity:0,transform:"translateY(14px) scale(.97)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.2,.8,.2,1)"}));
+    return 0; };
+  if(!sameRec||!olds.length) return fresh();
+  const oldAct=OLD.one||OLD.side, actBox=devEl.closest(".devbox"), actPlat=actBox.dataset.plat;
+  const used=new Set(); let change=false;
+  news.forEach(b=>{
+    const role=b.dataset.role, i=+b.dataset.i, d=devOf(b), scr=d.querySelector(".scr,.wmain"), o=olds.find(x=>x.plat===b.dataset.plat&&!used.has(x));
+    if(o){
+      used.add(o);
+      const wasMain=o.box.dataset.role==="main", isMain=role==="main", moved=Math.abs(o.rect.width-b.querySelector(".devwrap").getBoundingClientRect().width)>1||o.box.dataset.role!==role;
+      if(moved){ change=true; flipFrom(b,o,860,isMain?0:80); }
+      if(wasMain!==isMain) dimAnim(b,isMain,760,isMain?160:120);
+      if(o.i!==i){ if(o.kind===kindOf(d)) swapScreen(o.scr,scr,dir); else { d.animate([{opacity:0},{opacity:1}],{duration:420,easing:"ease-out"}); stagger(scr,dir,200); } }
+    } else {
+      change=true; enterSide(b,role==="main"?120:220,role==="main"); stagger(scr,1,role==="main"?560:720);
+    }
+  });
+  olds.filter(o=>!used.has(o)).forEach(o=>{ change=true; ghostOut(o,o.box.dataset.role==="main"?"left":"right"); });
+  if(!change) return 0;
+  lastPtr=null;
+  if(!oldAct||oldAct.plat!==actPlat){
+    const back=olds.some(o=>o.plat===actPlat), x=(L.split?L.f:(prevL&&prevL.f?prevL.f:.5))*sw;
+    swPill(back?`Regresa a ${platName(actPlat)}`:(actPlat==="mail"?"Abre tu correo":`Pasa a ${platName(actPlat)}`),x,sh/2,actPlat,back);
+    return back?1350:1500;
+  }
+  return 900;
 }
 function placeHint(){
   tip.hidden=true; ptr.hidden=true; tap.hidden=true;
   const sl=SL[I]; if(!sl||sl.type!=="step"||!devEl) return;
   const hi=devEl.querySelector(".hi"); if(!hi) return;
-  const fr=stage.getBoundingClientRect(), d=devEl.parentElement.getBoundingClientRect(), sc=d.width/devEl.offsetWidth;
+  const fr=stage.getBoundingClientRect(), d=devEl.closest(".devbox").getBoundingClientRect(), sc=d.width/devEl.offsetWidth;
   let ox=0, oy=0, e=hi; while(e&&e!==devEl){ ox+=e.offsetLeft; oy+=e.offsetTop; e=e.offsetParent; }
   const x=d.left-fr.left+ox*sc, y=d.top-fr.top+oy*sc, w=hi.offsetWidth*sc, h=hi.offsetHeight*sc;
   const isPhone=devEl.classList.contains("dev-phone");
@@ -1705,6 +1858,7 @@ function render(){
   const dir=(R===prevR?Math.sign(I-prevI):(R>prevR?1:-1))||1, sameRec=R===prevR;
   prevR=R; prevI=I; motionTok++; clearTimeout(hintTimer); closeGloss();
   [ptr,tap,tip].forEach(e=>e.getAnimations().forEach(a=>a.cancel()));
+  const OLD=snapDevices(), prevL=SPLITL;
   devEl=null; let typeEnd=0;
   const flag=[];
   if(sl.parts&&sl.parts.length>1&&sl.part) flag.push(`<span class="chip part">Parte ${sl.parts.indexOf(sl.part)+1} de ${sl.parts.length} · ${esc(sl.part)}</span>`);
@@ -1718,26 +1872,33 @@ function render(){
     body.innerHTML=`<div class="scard"><div class="check"><div class="ck-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><div><b>Revisa antes de seguir</b><small>Compara con lo que ves en tu pantalla</small></div></div>${sl.s.chk.map((c,k)=>`<label class="ck${sl.ok[k]?" on":""}"><input type="checkbox" data-k="${k}"${sl.ok[k]?" checked":""}><span class="bx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>${esc(c)}</span></label>`).join("")}<p class="ck-f" id="ckf">${sl.ok.every(Boolean)?"Todo listo. Ya puedes continuar.":"Marca las "+sl.ok.length+" casillas para continuar."}</p></div></div>`;
     body.querySelectorAll(".ck input").forEach(inp=>inp.addEventListener("change",()=>{ const k=+inp.dataset.k; sl.ok[k]=inp.checked; inp.closest(".ck").classList.toggle("on",inp.checked); updateNext(); $("ckf").textContent=sl.ok.every(Boolean)?"Todo listo. Ya puedes continuar.":"Marca las "+sl.ok.length+" casillas para continuar."; if(inp.checked&&!reduce) inp.nextElementSibling.animate([{transform:"scale(.6)"},{transform:"scale(1.12)",offset:.6},{transform:"scale(1)"}],{duration:320,easing:"cubic-bezier(.3,1.4,.5,1)"}); }));
   } else {
-    const dv=device(sl.s.s);
-    body.innerHTML=`<div class="devbox">${dv.html}</div>`;
-    devEl=body.querySelector(".dev-phone,.dev-web"); layoutShot(devEl);
+    const dv=device(sl.s.s), L=layoutFor(I);
+    if(L.split){
+      const fz=device(SL[L.lastMain].s.s);
+      L.f=splitFrac(fz.kind==="phone"?"phone":"web", dv.kind==="phone"?"phone":"web");
+      body.innerHTML=`<div class="devbox frozen" data-role="main" data-plat="${L.main}" data-i="${L.lastMain}" aria-hidden="true"><div class="devwrap">${fz.html}</div></div><div class="devbox" data-role="side" data-plat="${L.side}" data-i="${I}"><div class="devwrap">${dv.html}</div></div>`;
+      const fe=body.querySelector(".devbox.frozen .dev-phone,.devbox.frozen .dev-web"); fe.inert=true;
+      fe.querySelectorAll(".hot").forEach(h=>{ h.classList.remove("hi"); h.removeAttribute("tabindex"); h.removeAttribute("role"); });
+      fe.querySelectorAll(".dbtn.hi").forEach(h=>h.classList.remove("hi")); layoutShot(fe);
+    } else body.innerHTML=`<div class="devbox" data-role="one" data-plat="${L.main}" data-i="${I}"><div class="devwrap">${dv.html}</div></div>`;
+    SPLITL=L; renderPanes(L,prevL,!reduce);
+    devEl=body.querySelector(".devbox:not(.frozen) .dev-phone,.devbox:not(.frozen) .dev-web"); layoutShot(devEl);
     const _mm=sl.s.s.img&&IMG[sl.s.s.img], th=_mm&&_mm.site==="ax"?"ax":themeOf(sl.s.s), lbl=_mm&&_mm.site==="mail"?"Tu correo":_mm&&_mm.site==="bn"?"binance.com":{ax:"Portal Axen Broker",store:"Tienda de apps",bank:DEV==="web"?"Banca en línea de tu banco":"App de tu banco",gen:"Pago con tu tarjeta"}[th]||(sl.s.s.img&&IMG[sl.s.s.img]&&!IMG[sl.s.s.img].web&&DEV==="web"?`App ${PLAT()} · vista de referencia`:DEV==="web"?(C==="us"?"coinbase.com":"binance.com"):`App ${PLAT()}`);
     flag.push(`<span class="chip">${lbl}</span>`);
     const _m=sl.s.s.img&&IMG[sl.s.s.img];
     if(_m&&_m.adapt) flag.push(`<span class="chip ill">Captura adaptada · red Ethereum</span>`); else if(_m&&_m.real) flag.push(`<span class="chip ill">Captura real · datos ocultos</span>`); else if(sl.s.s.img||sl.s.s.ill) flag.push(`<span class="chip ill">Pantalla ilustrativa</span>`);
     fitDevice();
-    const newScr=devEl.querySelector(".scr,.wmain"), kind=kindOf(devEl);
+    const newScr=devEl.querySelector(".scr,.wmain");
     if(!reduce){
-      if(oldScr && kind===oldKind && sameRec){ swapScreen(oldScr,newScr,dir); }
-      else { lastPtr=null; devEl.animate([{opacity:0,transform:"translateY(22px) scale(.95)"},{opacity:1,transform:"none"}],{duration:560,easing:"cubic-bezier(.2,.8,.2,1)"}); stagger(newScr,dir,220); }
-      typeEnd=typeInputs(newScr);
+      const extra=transitionDevices(OLD,prevL,L,dir,sameRec,newScr);
+      typeEnd=Math.max(typeInputs(newScr)||0,extra);
     }
     const hi=devEl.querySelector(".hi");
     devEl.querySelectorAll(".hot,.dbtn.hi").forEach(h=>{ const act=()=>{ if(!h.classList.contains("hi")) return; if(h.classList.contains("pre")) nextHot(); else advance(true); };
       h.addEventListener("click",act); h.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); act(); } }); });
   }
   $("flag").innerHTML=flag.join("");
-  if(!devEl){ lastPtr=null; const card=body.querySelector(".intro,.check"); if(card&&!reduce){ card.animate([{opacity:0,transform:"translateY(18px) scale(.97)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.2,.8,.2,1)"}); [...card.querySelectorAll("li,.need,.goal,.meta,.ck,.golink")].forEach((el,k)=>el.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:380,delay:160+k*50,easing:"ease-out",fill:"backwards"})); } }
+  if(!devEl){ SPLITL=null; renderPanes(null,prevL,!reduce); lastPtr=null; const card=body.querySelector(".intro,.check"); if(card&&!reduce){ card.animate([{opacity:0,transform:"translateY(18px) scale(.97)"},{opacity:1,transform:"none"}],{duration:520,easing:"cubic-bezier(.2,.8,.2,1)"}); [...card.querySelectorAll("li,.need,.goal,.meta,.ck,.golink")].forEach((el,k)=>el.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:380,delay:160+k*50,easing:"ease-out",fill:"backwards"})); } }
   // panel
   const chips=[`<span class="chip">${esc(stageLabel(R))}</span>`,`<span class="chip soft">Guía ${gnum(R)} de ${visible().length}</span>`];
   $("chips").innerHTML=chips.join("");
