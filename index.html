@@ -880,6 +880,18 @@ main{flex:1;display:flex;flex-direction:column;align-items:center;padding-block:
 .swpill i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--pc);box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 32%,transparent)}
 .swpill svg{width:16px;height:16px;flex:none}
 @media (max-width:560px){.pane-tag small{display:none}.swpill{font-size:13px;padding:8px 14px 8px 11px}}
+
+/* ---- Lista de pasos del panel: siempre se puede desplazar para recapitular ---- */
+.slist>*{flex:none}
+.slist{scrollbar-width:thin;scrollbar-color:var(--line) transparent;overscroll-behavior:contain}
+.slist .sl-h{position:sticky;top:-12px;z-index:1;background:var(--surface);margin:-12px 0 4px;padding:12px 0 6px}
+.slist::-webkit-scrollbar{width:6px}.slist::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+@media (min-width:1000px) and (orientation:landscape) and (min-height:520px){
+  .pbody{overflow-x:hidden;overflow-y:auto;min-height:0;scrollbar-width:thin}
+  .pbody>.step{flex:1 1 auto;min-height:0}
+  .pbody>.step>div{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  .slist{flex:1 1 0;min-height:112px;overflow-y:auto;padding-bottom:6px}
+}
 </style>
 </head>
 <body>
